@@ -1,0 +1,36 @@
+# 1. Вывести список сотрудников, получающих заработную плату большую чем у непосредственного руководителя (Я выводил имена сотрудникоа)
+SELECT employees.NAME FROM EMPLOYEE AS employees, EMPLOYEE AS chives
+WHERE employees.CHIEF_ID = CHIVES.ID AND employees.SALARY > CHIVES.SALARY
+
+# 2. Вывести список сотрудников, получающих максимальную заработную плату в своём отделе (Я выводил имена сотрудников)
+SELECT employees.NAME FROM EMPLOYEE as employee1
+WHERE employee1.SALARY = (
+SELECT max(SALARY) FROM EMPLOYEE AS employee2
+WHERE employee1.DEPARTMENT_ID = employee2.DEPARTMENT_ID
+)
+
+
+# 3. Вывести список ID отделов, количество сотрудников в которых не превышает 3 человек (Я выводил названия отделов)
+SELECT NAME FROM DEPARTMENT
+WHERE ID IN (
+SELECT DEPARTMENT_ID
+FROM   EMPLOYEE
+GROUP  BY DEPARTMENT_ID
+HAVING count(*) <= 3
+)
+
+# 4. Вывести список сотрудников, не имеющих назначенного руководителя, работающего в том-же отделе (Я выводил имена сотрудников)
+SELECT employees.NAME FROM EMPLOYEE AS employees, EMPLOYEE AS chives
+WHERE employees.CHIEF_ID is NULL or (employees.CHIEF_ID = CHIVES.ID AND employees.DEPARTMENT_ID != CHIVES.DEPARTMENT_ID) 
+GROUP BY employees.NAME
+
+# 5. Найти список ID отделов с максимальной суммарной зарплатой сотрудников (Я выводил названия отделов)
+SELECT NAME FROM DEPARTMENT
+WHERE ID IN (WITH dep_salary AS (
+            SELECT department_id, sum(salary) AS salary
+            FROM employee 
+            GROUP BY department_id
+            )
+SELECT department_id
+FROM dep_salary
+WHERE dep_salary.salary = (SELECT max(salary) FROM dep_salary))
